@@ -33,16 +33,32 @@ export default function Home() {
   }
 
   // Score screen
+  // Score screen
   if (showScore) {
+    // กำหนดเงื่อนไข: ถ้าได้คะแนนมากกว่าครึ่งถือว่าชนะ
+    const isWin = score > lessonsData.length / 2;
+
     return (
       <main className={styles.main}>
         <div className={styles.container}>
-          <h1>ดีมาก! (Excellent!)</h1>
+          {isWin ? (
+            // หน้าจอสำหรับคนเก่ง (ชนะ)
+            <div className={styles.winArea}>
+              <h1 style={{ fontSize: "50px" }}>👑 ดีมาก! (Excellent!)</h1>
+            </div>
+          ) : (
+            // หน้าจอสำหรับคนต้องพยายามใหม่ (แพ้)
+            <div className={styles.loseArea}>
+              <h1 style={{ fontSize: "50px" }}>🥹 U Can Do It</h1>
+            </div>
+          )}
+
           <p className={styles.scoreText}>
             You scored {score} out of {lessonsData.length}
           </p>
+
           <button className={styles.restartBtn} onClick={restart}>
-            Try Again
+            {isWin ? "Try agin" : "Try agin"}
           </button>
         </div>
       </main>
