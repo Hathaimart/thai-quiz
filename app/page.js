@@ -1,66 +1,85 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import { lessonsData } from "./lessonsData";
 import styles from "./page.module.css";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
+  const [current, setCurrent] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showScore, setShowScore] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  function handleAnswer(answer) {
+    setSelected(answer);
+    if (answer === lessonsData[current].english) {
+      setScore(score + 1);
+    }
+
+    setTimeout(() => {
+      if (current + 1 < lessonsData.length) {
+        setCurrent(current + 1);
+        setSelected(null);
+      } else {
+        setShowScore(true);
+      }
+    }, 1000);
+  }
+
+  function restart() {
+    setCurrent(0);
+    setScore(0);
+    setShowScore(false);
+    setSelected(null);
+  }
+
+  // Score screen
+  if (showScore) {
+    return (
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <div className={styles.container}>
+          <h1>ดีมาก! (Excellent!)</h1>
+          <p className={styles.scoreText}>
+            You scored {score} out of {lessonsData.length}
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          <button className={styles.restartBtn} onClick={restart}>
+            Try Again
+          </button>
         </div>
       </main>
-    </div>
+    );
+  }
+
+  // Quiz screen
+  const lesson = lessonsData[current];
+  return (
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <p className={styles.progress}>
+          Phrase {current + 1} of {lessonsData.length}
+        </p>
+        <h1 className={styles.thai}>{lesson.thai}</h1>
+        <p className={styles.pronunciation}>{lesson.pronunciation}</p>
+        <p className={styles.question}>What does this mean?</p>
+
+        <div className={styles.options}>
+          {lesson.options.map((opt, i) => (
+            <button
+              key={i}
+              onClick={() => handleAnswer(opt)}
+              className={
+                selected === opt
+                  ? opt === lesson.english
+                    ? styles.correct
+                    : styles.wrong
+                  : ""
+              }
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+        <p className={styles.score}>Score: {score}</p>
+      </div>
+    </main>
   );
 }
